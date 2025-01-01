@@ -23,6 +23,21 @@ size_t ft_arrlen(char **s)
     return (i);
 }
 
+void sort_3(t_stack **a)
+{
+    while (1)
+    {
+        if (((*a)->number > (*a)->next->number) && ((*a)->number > (*a)->next->next->number))
+            ra((*a), 0);
+        else if ((*a)->number > (*a)->next->number)
+            sa((*a), 0);
+        else if (((*a)->next->number > (*a)->number) && ((*a)->next->number > (*a)->next->next->number))
+            rra((*a), 0);
+        else
+            break;
+    }
+}
+
 int main(int argc, char **argv)
 {
     t_stack *a = NULL;
@@ -59,23 +74,16 @@ int main(int argc, char **argv)
             sa(a, 0);
     }
     else if (ft_lstsize(a) == 3)
+        sort_3(&a);
+    else
     {
-        while (1)
-        {
-            if ((a->number > a->next->number) && (a->number > a->next->next->number))
-                ra(a, 0);
-            else if (a->number > a->next->number)
-                sa(a, 0);
-            else if ((a->next->number > a->number) && (a->next->number > a->next->next->number))
-                rra(a, 0);
-            else
-                break;
-        }
+        push_to_b(&a, &b);
+        take_targets(a, b);
     }
-    // t_stack *ptr = a;
+    // t_stack *ptr = b;
     // while (ptr)
     // {
-    //     ft_printf("%d\n", ptr->number);
+    //     printf("%d\n", ptr->target->number);
     //     ptr = ptr->next;
     // }
     ft_lstclear(&a);

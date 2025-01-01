@@ -1,13 +1,10 @@
 #ifndef PUSH_SWAP_H
 # define PUSH_SWAP_H
+
 #include <stdio.h>
-
-#ifndef p
-#define p ft_printf
-#endif
-
-# include "printf/ft_printf.h"
 #include <stdlib.h>
+#include <unistd.h>
+#include <limits.h>
 
 typedef struct s_stack
 {
@@ -39,5 +36,8 @@ void    rrb(t_stack *b, int flag);
 void    ss(t_stack *a, t_stack *b);
 void    pa(t_stack **a, t_stack **b);
 void    pb(t_stack **a, t_stack **b);
+void push_to_b(t_stack **a, t_stack **b);
+void sort_3(t_stack **a);
+void take_targets(t_stack *a, t_stack *b);
 
 #endif

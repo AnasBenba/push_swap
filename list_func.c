@@ -86,6 +86,7 @@ t_stack	*ft_lstnew(int number)
 	ptr->number = number;
 	ptr->next = NULL;
 	ptr->prev = NULL;
+	ptr->target = NULL;
 	return (ptr);
 }
 
@@ -327,4 +328,41 @@ char	*ft_strchr(const char *s, int c)
 	if ((char)c == '\0')
 		return (&str[i]);
 	return (NULL);
+}
+
+void push_to_b(t_stack **a, t_stack **b)
+{
+	while (ft_lstsize(*a) > 3)
+	{
+		pb(a, b);
+	}
+	sort_3(a);
+}
+
+void take_targets(t_stack *a, t_stack *b)
+{
+	int highest;
+	t_stack *current;
+	t_stack *ptr;
+
+	highest = INT_MAX;
+	ptr = b;
+	while (ptr)
+	{
+		current = a;
+		while (current)
+		{
+			if (current->number > ptr->number && current->number < highest)
+			{
+				ptr->target = current;
+				highest = current->number;
+			}
+			current = current->next;
+		}
+		if (highest == INT_MAX)
+			ptr->target = a;
+		else
+			highest = INT_MAX;
+		ptr = ptr->next;
+	}
 }

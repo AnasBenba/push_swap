@@ -30,11 +30,11 @@ int	ft_lstsize(t_stack *lst)
 	return (count);
 }
 
-int	ft_atoi(const char *str)
+long	ft_atoi(const char *str)
 {
-	int	i;
-	int	sign;
-	int	result;
+	long	i;
+	long	sign;
+	long	result;
 
 	i = 0;
 	sign = 1;
@@ -60,7 +60,9 @@ int	ft_atoi(const char *str)
 void	ft_lstadd_back(t_stack **lst, t_stack *new)
 {
 	t_stack	*ptr;
+	int		i;
 
+	i = 1;
 	if (new)
 	{
 		if (!*lst)
@@ -70,9 +72,14 @@ void	ft_lstadd_back(t_stack **lst, t_stack *new)
 		}
 		ptr = *lst;
 		while (ptr->next)
+		{
 			ptr = ptr->next;
+			i++;
+		}
 		ptr->next = new;
 		ptr->next->prev = ptr;
+		ptr = ptr->next;
+		ptr->index = i;
 	}
 }
 
@@ -87,6 +94,7 @@ t_stack	*ft_lstnew(int number)
 	ptr->next = NULL;
 	ptr->prev = NULL;
 	ptr->target = NULL;
+	ptr->index = 0;
 	return (ptr);
 }
 
@@ -240,6 +248,7 @@ int is_valid(char **argv)
 	}
 	return (1);
 }
+
 int is_duplicate(char **argv)
 {
 	int i;
@@ -336,7 +345,27 @@ void push_to_b(t_stack **a, t_stack **b)
 	{
 		pb(a, b);
 	}
+	fix_index(*b);
 	sort_3(a);
+}
+
+t_stack *small_number(t_stack *a)
+{
+	t_stack *ptr;
+	int tmp;
+
+	ptr = a;
+	tmp = a->number;
+	while (a)
+	{
+		if (tmp > a->number)
+		{
+			tmp = a->number;
+			ptr = a;
+		}
+		a = a->next;
+	}
+	return (ptr);
 }
 
 void take_targets(t_stack *a, t_stack *b)
@@ -360,9 +389,143 @@ void take_targets(t_stack *a, t_stack *b)
 			current = current->next;
 		}
 		if (highest == INT_MAX)
-			ptr->target = a;
+			ptr->target = small_number(a);
 		else
 			highest = INT_MAX;
 		ptr = ptr->next;
 	}
+}
+
+void fix_index(t_stack *a)
+{
+	int		i;
+
+	i = 0;
+	while (a)
+	{
+		a->index = i;
+		a = a->next;
+		i++;
+	}
+}
+
+void up_or_down(t_stack *stack)
+{
+	int line;
+
+	if (stack == NULL)
+		return ;
+	line = ft_lstsize(stack) / 2;
+	while (stack)
+	{
+		if (stack->index <= line)
+			stack->above_line = 1;
+		else
+			stack->above_line = 0;
+		stack = stack->next;
+	}
+}
+
+void cost(t_stack *a, t_stack *b)
+{
+	int length_a;
+	int length_b;
+
+	length_a = ft_lstsize(a);
+	length_b = ft_lstsize(b);
+	while (b)
+	{
+		b->cost_num = b->index;
+		if (b->above_line == 0)
+			b->cost_num = length_b - b->index;
+		if (b->target->above_line == 1)
+			b->cost_num += b->target->index;
+		else
+			b->cost_num += length_a - b->target->index;
+		b = b->next;
+	}
+}
+
+void perfect_to_push(t_stack *b)
+{
+	int best;
+	t_stack *best_node;
+
+	best = INT_MAX;
+	if (b == NULL)
+		return ;
+	while (b)
+	{
+		if (b->cost_num < best)
+		{
+			best = b->cost_num;
+			best_node = b;
+		}
+		b = b->next;
+	}
+	best_node->to_push = 1;
+}
+
+void last_rb(t_stack **b, t_stack *stack)
+{
+	while ((*b) != stack)
+	{
+		if (stack->above_line == 1)
+			rb(b, 0);
+		else
+			rrb(*b, 0);
+	}
+}
+
+void last_ra(t_stack **a, t_stack *stack)
+{
+	while ((*a) != stack)
+	{
+		if (stack->above_line == 1)
+			ra(a, 0);
+		else
+			rra(a, 0);
+	}
+}
+
+void rr_both(t_stack **a, t_stack **b, t_stack *stack)
+{
+	while ((*a) != stack->target &&
+		(*b) != stack)
+			rr(a, b);
+	fix_index(*a);
+	fix_index(*b);
+	up_or_down(*a);
+	up_or_down(*b);
+}
+
+void rrr_both(t_stack **a, t_stack **b, t_stack *stack)
+{
+	while ((*a) != stack->target &&
+		(*b) != stack)
+			rrr(*a, *b);
+	fix_index(*a);
+	fix_index(*b);
+	up_or_down(*a);
+	up_or_down(*b);
+}
+
+void sort(t_stack **a, t_stack **b)
+{
+	t_stack *best_node;
+	
+	best_node = *b;
+	while (best_node->to_push != 1)
+		best_node = best_node->next;
+	if (best_node->above_line == 1 && best_node->target->above_line == 1)
+		rr_both(a, b, best_node);
+	else if (best_node->above_line == 0 && best_node->target->above_line == 0)
+		rrr_both(a, b, best_node);
+	last_rb(b, best_node);
+	last_ra(a, best_node->target);
+	pa(a, b);
+	fix_index(*a);
+	fix_index(*b);
+	up_or_down(*a);
+	up_or_down(*b);
 }

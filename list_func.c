@@ -610,9 +610,9 @@ void	ft_lstadd_back(t_stack **lst, t_stack *new)
     }
 }
 
-t_stack	*ft_lstnew(int number)
+t_stack *ft_lstnew(int number)
 {
-    t_stack	*ptr;
+    t_stack *ptr;
 
     ptr = malloc(sizeof(t_stack));
     if (!ptr)
@@ -622,6 +622,9 @@ t_stack	*ft_lstnew(int number)
     ptr->prev = NULL;
     ptr->target = NULL;
     ptr->index = 0;
+    ptr->cost_num = 0;
+    ptr->above_line = 0;
+    ptr->to_push = 0;
     return (ptr);
 }
 
@@ -925,6 +928,7 @@ void take_targets(t_stack *a, t_stack *b)
     t_stack *ptr;
 
     highest = INT_MAX;
+	current = NULL;
     ptr = b;
     while (ptr)
     {
@@ -1023,6 +1027,7 @@ void perfect_to_push(t_stack *b)
     t_stack *best_node;
 
     best = INT_MAX;
+	best_node = NULL;
     if (b == NULL)
         return ;
     while (b)
@@ -1102,22 +1107,30 @@ void rrr_both(t_stack **a, t_stack **b, t_stack *stack)
 // }
 void sort(t_stack **a, t_stack **b)
 {
-    t_stack *best_node;
+    t_stack *best_node = NULL; // Initialize to NULL
+    int min_cost = INT_MAX;    // Initialize to a large value
 
-    best_node = *b;
-    while (best_node && best_node->to_push != 1)
-        best_node = best_node->next;
-    if (!best_node || !best_node->target)
-        return;
-    if (best_node->above_line == 1 && best_node->target->above_line == 1)
-        rr_both(a, b, best_node);
-    else if (best_node->above_line == 0 && best_node->target->above_line == 0)
-        rrr_both(a, b, best_node);
-    last_rb(b, best_node);
-    last_ra(a, best_node->target);
-    pa(a, b);
-    fix_index(*a);
-    fix_index(*b);
-    up_or_down(*a);
-    up_or_down(*b);
+    // Find the node with the minimum cost
+    t_stack *current = *b;
+    while (current)
+    {
+        if (current->to_push == 1 && current->cost_num < min_cost)
+        {
+            min_cost = current->cost_num;
+            best_node = current;
+        }
+        current = current->next;
+    }
+
+    // Perform sorting operations
+    if (best_node && best_node->target)
+    {
+        if (best_node->above_line == 1 && best_node->target->above_line == 1)
+            rr_both(a, b, best_node);
+        else if (best_node->above_line == 0 && best_node->target->above_line == 0)
+            rrr_both(a, b, best_node);
+        last_rb(b, best_node);
+        last_ra(a, best_node->target);
+        pa(a, b);
+    }
 }

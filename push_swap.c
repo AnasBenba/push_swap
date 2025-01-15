@@ -1,21 +1,31 @@
+// 
+
 #include "push_swap.h"
 
 int stack_init(t_stack **a, char **s)
 {
     t_stack *ptr;
     long test;
-
     int i = 0;
+
     while (s[i])
     {
         test = ft_atoi(s[i]);
         if (test > INT_MAX || test < INT_MIN)
         {
             ft_free(s);
+            ft_lstclear(a); // Free the stack if initialization fails
             write(2, "Error\n", 6);
-            return (1);
+            exit(1);
         }
-        ptr = ft_lstnew(ft_atoi(s[i]));
+        ptr = ft_lstnew((int)test); // Casting test to int
+        if (!ptr)
+        {
+            ft_free(s);
+            ft_lstclear(a); // Free the stack if initialization fails
+            write(2, "Error\n", 6);
+            exit(1);
+        }
         ft_lstadd_back(a, ptr);
         i++;
     }
@@ -35,7 +45,7 @@ size_t ft_arrlen(char **s)
         {
             ft_free(s);
             write(2, "Error\n", 6);
-            return (1);
+            exit(1);
         }
         i++;
     }
@@ -44,6 +54,9 @@ size_t ft_arrlen(char **s)
 
 void sort_3(t_stack **a)
 {
+    if (!a || !(*a) || !(*a)->next || !(*a)->next->next)
+        return;
+
     while (1)
     {
         if (((*a)->number > (*a)->next->number) && ((*a)->number > (*a)->next->next->number))
@@ -63,7 +76,7 @@ int main(int argc, char **argv)
     t_stack *b = NULL;
     t_stack *ptr;
     t_stack *tmp;
-    char * t;
+    char *t;
     int i;
     char **s;
     char *j = NULL;
@@ -74,21 +87,34 @@ int main(int argc, char **argv)
     while (argv[i])
     {
         t = j;
-        j = ft_strjoin(j , argv[i++]);
+        j = ft_strjoin(j, argv[i++]);
+        if (!j)
+        {
+            write(2, "Error\n", 6);
+            exit(1);
+        }
         free(t);
     }
-    i = 1;
     s = ft_split(j, ' ');
-    free(j);
-    if (is_valid(s) == 0 || is_duplicate(s) == 0)
+    if (!s || is_valid(s) == 0 || is_duplicate(s) == 0)
     {
         ft_free(s);
+        free(j);
         write(2, "Error\n", 6);
-        return (1);
+        exit(1);
     }
     if (ft_arrlen(s) == 1)
-        return (0);
-    stack_init(&a, s);
+    {
+        ft_free(s);
+        free(j);
+        return (1);
+    }
+    if (stack_init(&a, s) == 1)
+    {
+        ft_free(s);
+        free(j);
+        return (1);
+    }
     if (ft_lstsize(a) == 2)
     {
         if (a->number > a->next->number)
@@ -133,25 +159,6 @@ int main(int argc, char **argv)
             tmp = a;
         }
     }
-    // while (a){
-    //     printf("%d\n", a->number);
-    //     a = a->next;
-    // }
-    // fix_index(a);
-    // up_or_down(a);
-    // ptr = small_number(a);
-    // if (ptr->above_line ==  1)
-    //     while (a->number != ptr->number)
-    //         ra(a, 1);
-    // else
-    //     while (a->number != ptr->number)
-    //         rra(a, 1);
-    // ptr = a;
-    // while (ptr)
-    // {
-    //     printf("%d\n", ptr->number);
-    //     ptr = ptr->next;
-    // }
     ft_lstclear(&a);
     ft_free(s);
     free(j);

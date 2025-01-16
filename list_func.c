@@ -1086,51 +1086,51 @@ void rrr_both(t_stack **a, t_stack **b, t_stack *stack)
     up_or_down(*b);
 }
 
-// void sort(t_stack **a, t_stack **b)
-// {
-//     t_stack *best_node;
-    
-//     best_node = *b;
-//     while (best_node->to_push != 1)
-//         best_node = best_node->next;
-//     if (best_node->above_line == 1 && best_node->target->above_line == 1)
-//         rr_both(a, b, best_node);
-//     else if (best_node->above_line == 0 && best_node->target->above_line == 0)
-//         rrr_both(a, b, best_node);
-//     last_rb(b, best_node);
-//     last_ra(a, best_node->target);
-//     pa(a, b);
-//     fix_index(*a);
-//     fix_index(*b);
-//     up_or_down(*a);
-//     up_or_down(*b);
-// }
 void sort(t_stack **a, t_stack **b)
 {
-    t_stack *best_node = NULL; // Initialize to NULL
-    int min_cost = INT_MAX;    // Initialize to a large value
-
-    // Find the node with the minimum cost
-    t_stack *current = *b;
-    while (current)
-    {
-        if (current->to_push == 1 && current->cost_num < min_cost)
-        {
-            min_cost = current->cost_num;
-            best_node = current;
-        }
-        current = current->next;
-    }
-
-    // Perform sorting operations
-    if (best_node && best_node->target)
-    {
-        if (best_node->above_line == 1 && best_node->target->above_line == 1)
-            rr_both(a, b, best_node);
-        else if (best_node->above_line == 0 && best_node->target->above_line == 0)
-            rrr_both(a, b, best_node);
-        last_rb(b, best_node);
-        last_ra(a, best_node->target);
-        pa(a, b);
-    }
+    t_stack *best_node;
+    
+    best_node = *b;
+    while (best_node->to_push != 1)
+        best_node = best_node->next;
+    if (best_node->above_line == 1 && best_node->target->above_line == 1)
+        rr_both(a, b, best_node);
+    else if (best_node->above_line == 0 && best_node->target->above_line == 0)
+        rrr_both(a, b, best_node);
+    last_rb(b, best_node);
+    last_ra(a, best_node->target);
+    pa(a, b);
+    fix_index(*a);
+    fix_index(*b);
+    up_or_down(*a);
+    up_or_down(*b);
 }
+// void sort(t_stack **a, t_stack **b)
+// {
+//     t_stack *best_node = NULL; // Initialize to NULL
+//     int min_cost = INT_MAX;    // Initialize to a large value
+
+//     // Find the node with the minimum cost
+//     t_stack *current = *b;
+//     while (current)
+//     {
+//         if (current->to_push == 1 && current->cost_num < min_cost)
+//         {
+//             min_cost = current->cost_num;
+//             best_node = current;
+//         }
+//         current = current->next;
+//     }
+
+//     // Perform sorting operations
+//     if (best_node && best_node->target)
+//     {
+//         if (best_node->above_line == 1 && best_node->target->above_line == 1)
+//             rr_both(a, b, best_node);
+//         else if (best_node->above_line == 0 && best_node->target->above_line == 0)
+//             rrr_both(a, b, best_node);
+//         last_rb(b, best_node);
+//         last_ra(a, best_node->target);
+//         pa(a, b);
+//     }
+// }
